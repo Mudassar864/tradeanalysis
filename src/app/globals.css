@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #090b10;
+  --foreground: #ece7dc;
+  --card: #12151c;
+  --card-foreground: #ece7dc;
+  --muted: #1a1e27;
+  --muted-foreground: #9b9588;
+  --border: rgba(236, 231, 220, 0.12);
+  --input: rgba(236, 231, 220, 0.14);
+  --primary: #e4c27a;
+  --primary-foreground: #1c1508;
+  --profit: #7dcaa0;
+  --loss: #e38b7b;
+  --ring: #e4c27a;
+  --radius: 0.8rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-profit: var(--profit);
+  --color-loss: var(--loss);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius-lg: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.desk-grid {
+  background-image:
+    linear-gradient(to right, rgba(228, 194, 122, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(228, 194, 122, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+dialog.desk-dialog {
+  width: min(440px, calc(100vw - 2rem));
+  margin: auto;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  color: var(--foreground);
+  padding: 0;
+}
+
+dialog.desk-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.66);
 }
