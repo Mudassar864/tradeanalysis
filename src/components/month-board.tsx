@@ -68,9 +68,8 @@ export function MonthBoard({ trades }: { trades: TradeView[] }) {
           const future = day > today;
           const isSelected = day === selected;
           const dayTrades = byDay.get(day) ?? [];
-          const profit = dayTrades.reduce((sum, trade) => sum + ((trade.netPnl ?? 0) > 0 ? (trade.netPnl ?? 0) : 0), 0);
-          const loss = dayTrades.reduce((sum, trade) => sum + ((trade.netPnl ?? 0) < 0 ? (trade.netPnl ?? 0) : 0), 0);
-          const net = profit + loss;
+          const total = dayTrades.reduce((sum, trade) => sum + (trade.netPnl ?? 0), 0);
+          const hasTrades = dayTrades.length > 0;
           return (
             <div
               key={day}
@@ -79,11 +78,11 @@ export function MonthBoard({ trades }: { trades: TradeView[] }) {
               aria-current={day === today ? "date" : undefined}
               className={cn(
                 "flex min-h-20 flex-col rounded-xl border px-1.5 py-1.5 text-sm",
-                net > 0 && "border-profit bg-profit text-[#14261c]",
-                net < 0 && "border-loss bg-loss text-[#2a1210]",
-                net === 0 && (isSelected ? "border-primary bg-primary/10" : "border-transparent bg-background hover:border-border"),
-                net === 0 && day === today && !isSelected && "border-border",
-                isSelected && net !== 0 && "ring-2 ring-primary ring-offset-2 ring-offset-card",
+                hasTrades && total > 0 && "border-profit bg-profit text-[#14261c]",
+                hasTrades && total < 0 && "border-loss bg-loss text-[#2a1210]",
+                total === 0 && (isSelected ? "border-primary bg-primary/10" : "border-transparent bg-background hover:border-border"),
+                total === 0 && day === today && !isSelected && "border-border",
+                isSelected && total !== 0 && "ring-2 ring-primary ring-offset-2 ring-offset-card",
                 future && "opacity-35",
               )}
             >
@@ -97,11 +96,8 @@ export function MonthBoard({ trades }: { trades: TradeView[] }) {
                 className="flex flex-1 flex-col items-start text-left disabled:cursor-not-allowed"
               >
                 <span>{Number(day.slice(-2))}</span>
-                {profit > 0 ? (
-                  <span className="mt-auto font-mono text-[11px] tabular-nums">{formatMoney(profit)}</span>
-                ) : null}
-                {loss < 0 ? (
-                  <span className="font-mono text-[11px] tabular-nums">{formatMoney(loss)}</span>
+                {hasTrades ? (
+                  <span className="mt-auto font-mono text-[11px] tabular-nums">{formatMoney(total)}</span>
                 ) : null}
               </button>
               {isSelected ? (
