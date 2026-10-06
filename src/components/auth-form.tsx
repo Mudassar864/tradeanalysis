@@ -11,6 +11,7 @@ import { credentialsSchema } from "@/lib/validators";
 export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({});
   const signUp = mode === "sign-up";
@@ -79,14 +80,25 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={signUp ? "new-password" : "current-password"}
-          required
-          minLength={8}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete={signUp ? "new-password" : "current-password"}
+            required
+            minLength={8}
+            className="pr-16"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((current) => !current)}
+            aria-pressed={showPassword}
+            className="absolute inset-y-0 right-2 flex items-center text-xs text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
         <FieldError messages={fieldErrors.password} />
         {signUp ? (
           <p className="text-xs leading-5 text-muted-foreground">At least 8 characters, with a letter and a number.</p>

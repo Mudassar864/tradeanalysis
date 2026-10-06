@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { TradePopup } from "@/components/trade-popup";
 import { Button } from "@/components/ui/button";
 import { formatMoney } from "@/lib/format";
-import { dateKey, formatTradeDate, type TradeView } from "@/lib/types";
+import { dateKey, type TradeView } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -70,41 +70,53 @@ export function MonthBoard({ trades }: { trades: TradeView[] }) {
           const dayTrades = byDay.get(day) ?? [];
           const profit = dayTrades.reduce((sum, trade) => sum + ((trade.netPnl ?? 0) > 0 ? (trade.netPnl ?? 0) : 0), 0);
           const loss = dayTrades.reduce((sum, trade) => sum + ((trade.netPnl ?? 0) < 0 ? (trade.netPnl ?? 0) : 0), 0);
+          const net = profit + loss;
           return (
-            <button
+            <div
               key={day}
-              type="button"
               role="gridcell"
-              disabled={future}
-              aria-current={day === today ? "date" : undefined}
               aria-selected={isSelected}
-              onClick={() => {
-                setSelected(day);
-                setPopupOpen(false);
-              }}
+              aria-current={day === today ? "date" : undefined}
               className={cn(
-                "flex min-h-20 flex-col items-start rounded-xl border px-2 py-1.5 text-left text-sm disabled:cursor-not-allowed disabled:opacity-35",
-                isSelected ? "border-primary bg-primary/10" : "border-transparent bg-background hover:border-border",
-                day === today && !isSelected && "border-border",
+                "flex min-h-20 flex-col rounded-xl border px-1.5 py-1.5 text-sm",
+                net > 0 && "border-profit bg-profit text-[#14261c]",
+                net < 0 && "border-loss bg-loss text-[#2a1210]",
+                net === 0 && (isSelected ? "border-primary bg-primary/10" : "border-transparent bg-background hover:border-border"),
+                net === 0 && day === today && !isSelected && "border-border",
+                isSelected && net !== 0 && "ring-2 ring-primary ring-offset-2 ring-offset-card",
+                future && "opacity-35",
               )}
             >
-              <span>{Number(day.slice(-2))}</span>
-              {profit > 0 ? (
-                <span className="mt-auto font-mono text-[11px] tabular-nums text-profit">{formatMoney(profit)}</span>
+              <button
+                type="button"
+                disabled={future}
+                onClick={() => {
+                  setSelected(day);
+                  setPopupOpen(false);
+                }}
+                className="flex flex-1 flex-col items-start text-left disabled:cursor-not-allowed"
+              >
+                <span>{Number(day.slice(-2))}</span>
+                {profit > 0 ? (
+                  <span className="mt-auto font-mono text-[11px] tabular-nums">{formatMoney(profit)}</span>
+                ) : null}
+                {loss < 0 ? (
+                  <span className="font-mono text-[11px] tabular-nums">{formatMoney(loss)}</span>
+                ) : null}
+              </button>
+              {isSelected ? (
+                <button
+                  type="button"
+                  onClick={() => setPopupOpen(true)}
+                  aria-label="Add trade"
+                  className="mt-1 w-full rounded-full bg-primary px-1 py-1 text-[10px] font-medium leading-none text-primary-foreground"
+                >
+                  Add
+                </button>
               ) : null}
-              {loss < 0 ? (
-                <span className="font-mono text-[11px] tabular-nums text-loss">{formatMoney(loss)}</span>
-              ) : null}
-            </button>
+            </div>
           );
         })}
-      </div>
-
-      <div className="mt-4 flex min-h-10 items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">{selected ? formatTradeDate(selected) : "No date selected."}</p>
-        {selected ? (
-          <Button onClick={() => setPopupOpen(true)}>Add trade</Button>
-        ) : null}
       </div>
 
       {selected ? (
